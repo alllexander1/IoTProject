@@ -222,52 +222,55 @@ For the cloud part AWS (Amazon Web Services) is used. The cloud system consists 
 
 <img src="img/cloud_diagram.png">
 <br>
+<br>
 
-***Create EC2 instance***
+**Set up**
 
-<img src="img/image.png">
+***Create EC2 instance:***
+
+<img src="img/image.png" width="80%" height="80%">
 
 After signing up, you have to put in your username and password and hit the log in button.
 
-<img src="img/image-1.png">
+<img src="img/image-1.png" width="80%" height="80%">
 
 In the aws academy navigation you'll click on Modules and select Learner Lab.
 
-<img src="img/image-2.png">
+<img src="img/image-2.png" width="80%" height="80%">
 
 In the Learner Lab environment click on the right side "Start Lab" and wait till the red button next to "AWS" on the left side turns green.
 
-<img src="img/image-3.png">
+<img src="img/image-3.png" width="80%" height="80%">
 
 Click on "AWS" next to the green button and wait. If nothing happens, change your browser or check your ad blockers and settings.
 
-<img src="img/image-4.png">
+<img src="img/image-4.png" width="80%" height="80%">
 
-<img src="img/image-5.png">
+<img src="img/image-5.png" width="80%" height="80%">
 
-<img src="img/image-6.png">
+<img src="img/image-6.png" width="80%" height="80%">
 
 On your first visit, click on Services and scroll down to E. Choose EC2. A other option would be to write EC2 in the search bar and choose it from there. After visiting the EC2 (Instances (running)) Page you can also click on EC2 under Recently visited.
-<img src="img/image-8.png">
+<img src="img/image-8.png" width="80%" height="80%">
 
 Click on Instances (running)
 
-<img src="img/image-9.png">
+<img src="img/image-9.png" width="80%" height="80%">
 
 Click on the yellow "Launch instances" button on the right top corner.
 
-<img src="img/image-11.png">
+<img src="img/image-11.png" width="80%" height="80%">
 
 Give the instance a name
 
-<img src="img/image-12.png">
+<img src="img/image-12.png" width="80%" height="80%">
 
 Select a Amazon Machine Image (AMI). 
 For our project we used ubuntu.
 Click the ubuntu option. 
 Leave the Server and the Architecture as it is.
 
-<img src="img/image-13.png">
+<img src="img/image-13.png" width="80%" height="80%">
 
 For the instance type, select the Free tier eligible version. Which is the t2.micro.
 
@@ -280,144 +283,142 @@ Click on the yellow button with the text "Create key pair" on it.
 Choose a place to safe your key.
 Choose the Key pair you created.
 
-<img src="img/image-14.png">
+<img src="img/image-14.png" width="80%" height="80%">
 
 Leave the Network Settings as they are.
 
-<img src="img/image-15.png">
+<img src="img/image-15.png" width="80%" height="80%">
 
 Set the configure storage to 30 GiB
 Scroll down. Check the summary and click on the yellow button ("Launch instance") on the lower right corner.
 
 The Instance will be shown under Instances after a little while. Under Status checked it might be shown as Initializing. After a while it will turn to 2/2 checks passed.
 
-<img src="img/image-17.png">
+<img src="img/image-17.png" width="80%" height="80%">
 
 Click the checkbox next to the instance name.
 In the lower part of the screen you will find the instance summary. 
 Search for VPC ID and click on the ID.
 
-<img src="img/image-18.png">
+<img src="img/image-18.png" width="80%" height="80%">
 
 On this page, click again on the VPC ID.
 
-<img src="img/image-19.png">
+<img src="img/image-19.png" width="80%" height="80%">
 
 Click on the "Actions" button on the upper right corner and choose "Edit CIDRs".
 
-<img src="img/image-20.png">
+<img src="img/image-20.png" width="80%" height="80%">
 
 Click on "Add new IPv6 CIDR
 
-<img src="img/image-21.png">
+<img src="img/image-21.png" width="80%" height="80%">
 
 Select "Amazon-provided IPv6 CIDR block and click on "Select CIDR".
 
-<img src="img/image-22.png">
+<img src="img/image-22.png" width="80%" height="80%">
 
 You should now see the status "Associated".
 Click on the VPC ID on the top to see details to your VPC ID. 
 
-<img src="img/image-23.png">
+<img src="img/image-23.png" width="80%" height="80%">
 
 Here you should see your IPv6.
 Click on Route tables on the left side navigation bar.
 
-<img src="img/image-24.png">
+<img src="img/image-24.png" width="80%" height="80%">
 
 In the lower part select the tier with the name "Routes" and click the button "Edit routes" on the right side.
 
-<img src="img/image-26.png">
+<img src="img/image-26.png" width="80%" height="80%">
 
 Click "Add route" for the destination use ::/0 and for the target use your amazon default value. 
 Click "Add route again and use the destination 0.0.0.0./0 if it is not already set. use the same default value as a target.
 Save the changes with the click on the yellow button.
 Click on "Route tables" at the top.
 
-<img src="img/image-27.png">
+<img src="img/image-27.png" width="80%" height="80%">
 
 Our new routes are now shown in the lower part.
 Click on Subnets
 
-<img src="img/image-28.png">
+<img src="img/image-28.png" width="80%" height="80%">
 
 Click the checkbox next to the name. Click on the "Action" button on the upper right corner and select "Edit IPv6 CIDRs.
 
-<img src="img/image-29.png">
+<img src="img/image-29.png" width="80%" height="80%">
 
 If the Subnet CIDR block is not already set, Click on "Add IPv6 CIDR" and save the changes by clicking the yellow button on the right lower corner.
 Then go back to your instances screen.
 
-<img src="img/image-31.png">
+<img src="img/image-31.png" width="80%" height="80%">
 
-<img src="img/image-32.png">
+<img src="img/image-32.png" width="80%" height="80%">
 
 Click the checkbox next to your instance and scroll further down on the lower part, till you see your Network interface click on the Interface ID.
 
-<img src="img/image-33.png">
+<img src="img/image-33.png" width="80%" height="80%">
 
 Click the Network Interface ID again.
 
-<img src="img/image-34.png">
+<img src="img/image-34.png" width="80%" height="80%">
 
 Click on the "Actions" button on the upper right corner and select "Manage IP addresses".
 
-<img src="img/image-35.png">
+<img src="img/image-35.png" width="80%" height="80%">
 
 Click the button "Assign new IP address" in the IPv6 section.
 
-<img src="img/image-36.png">
+<img src="img/image-36.png" width="80%" height="80%">
 
 After clicking the Assign button, leave it to Auto-assign and click the yellow "Save" button.
 
-<img src="img/image-37.png">
+<img src="img/image-37.png" width="80%" height="80%">
 
 You wil end up at the Network interface summary page. Since your IPv6 addresses is not shown, click the page refreshing button.
 
-<img src="img/image-38.png">
+<img src="img/image-38.png" width="80%" height="80%">
 
 The IPv6 addresses should now be visible.
 Go back to your instances screen.
 
-<img src="img/image-39.png">
+<img src="img/image-39.png" width="80%" height="80%">
 
 Click the checkbox next to your instance. On the lower part, click on the tier "Security". Click the link under "Security groups".
 
-<img src="img/image-40.png">
+<img src="img/image-40.png" width="80%" height="80%">
 
 On the lower part, stay on the tier "Inbound rules" and click the button on the right "Edit inbound rules.
 
-<img src="img/image-41.png">
+<img src="img/image-41.png" width="80%" height="80%">
 
 click on "Add rule".
 
-<img src="img/image-42.png">
+<img src="img/image-42.png" width="80%" height="80%">
 
 Fill in the list above. (Some ports could be different for you).
 After filling in all of them, click the yellow button "Save rules".
 Go back to your instances screen.
 
-<img src="img/image-43.png">
+<img src="img/image-43.png" width="80%" height="80%">
 
 Click on the checkbox next to your instance and click the "Connect button". 
 
-<img src="img/image-45.png">
+<img src="img/image-45.png" width="80%" height="80%">
 
 On the first tier click on the yellow button "Connect".
 
-<img src="img/image-44.png">
+<img src="img/image-44.png" width="80%" height="80%">
 
 Now your instance is connected.
 Go back to the Connect to instance screen.
 
-<img src="img/image-46.png">
+<img src="img/image-46.png" width="80%" height="80%">
 
 To be able to use multiple terminals of your instance, select the tier "SSH client". 
 Copy the Example and use it in your Linux Ubuntu environment. To connect to your instance from a different terminal.
 
 Your EC2 is established. 
-
-***Create EC2 instance:***
 
 ***Installations:***
 1. Open the EC2 instance terminal or connect via ssh. 
