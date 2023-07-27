@@ -73,7 +73,7 @@
   - [Sensor Node](#sensor-node)
   - [Cloud](#cloud)
   - [User Interface](#user-interface)
-- [Start System](#start-system)
+- [Start The System](#start-the-system)
 - [Sources](#sources)
 
 
@@ -83,7 +83,7 @@
 
 **Project description:**
 
-The goal of the project is to create a system where sensor data can be send from a microcontroller to a cloud. The data should be send every *x* seconds and must be stored at the cloud. Also a user interface should be implemented where the data can be visualized. The UI should run on any local PC. The user should also be able to send commands back to the sensor node (e.g. request the sensor data immediately).
+The goal of the project is to create a system where sensor data can be send from a microcontroller to a cloud. The data should be send every *x* (e.g. 60) seconds and must be stored at the cloud. Also a user interface should be implemented where the data can be visualized. The UI must run on any local PC. The user should also be able to send commands back to the sensor node (e.g. request the sensor data immediately).
 
 **System architecture:**
 
@@ -91,24 +91,24 @@ The goal of the project is to create a system where sensor data can be send from
 <br>
 The system consists of three main parts:
 
-- The first part is responsible for sending the sensor data to the cloud. It consists of an *nrf52840dk* board which captures the data and send it to the cloud using MQTT-SN protocol, an *nrf52840dongle* as border router to route the packets and a Linux system which forward the packets.
+- The first part is responsible for sending the sensor data to the cloud. It consists of a *nrf52840dk* board which captures the data and send it to the cloud using MQTT-SN protocol, a *nrf52840dongle* as a border router to route the packets between a 6Lo network and a normal IPv6 network and a Linux system with IPv6 connection to forwards the packets.
 - The second part is the cloud. It consists of a MQTT broker as a middleware between the sensor node and the backend script. The backend script is responsible for storing the data into a SQLITE database and sending it to the end user.
 - The last part is the user interface which is a desktop program and can run on any PC with IPv6 connection.
 
 
 # Set Up
 
-In this chapter all of the system components will be explained. For each component there will also be a guide how to set it up.
+In this chapter all of the system components will be explained. For each component there will be a guide how to set it up.
 
 ## Virtual Machine
 
 **Overview:**
 
-For this project, a Linux operating system is required. It can be either be a host system or a guest system on a virtual machine. The machine on which Linux is running is used to forward IPv6 packets from the the sensor node to the cloud and back. It is also used for implementation tasks, connecting with the boards, monitoring the board terminal and debugging tasks. If a Linux system is already installed, the VirtualBox installation can be skipped. 
+For this project, a Linux operating system is required. It can be either be a host system or a guest system in a virtual machine. The machine on which Linux is running is used to forward IPv6 packets from the the sensor node to the cloud and back. It is also used for implementation tasks, connecting with the boards, monitoring the board terminal and debugging tasks. If a Linux system is already installed, the VirtualBox installation can be skipped. 
 
 **Set up:**
 
-The following steps will explain how to set up a Ubuntu virtual machine. After that, it will be explained what configurations have to be done and what software have to be installed.
+The following steps will explain how to set up an Ubuntu virtual machine. After that, it will be explained what configurations have to be done and what software have to be installed.
 
 ***Virtual box and Ubuntu installation:***
 
@@ -117,7 +117,7 @@ The following steps will explain how to set up a Ubuntu virtual machine. After t
 3. Follow the [tutorial](https://www.geeksforgeeks.org/how-to-install-ubuntu-on-virtualbox/) to create a Ubuntu virtual machine.
 4. Install the [Guest Additions](https://www.youtube.com/watch?v=zdkl16oAS1k&t=8s).
 
-***Configurations and installations***
+***Configurations and installations:***
 
 1. Allow IPv6 forwarding.
     - Open the file ```/etc/sysctl.conf```
@@ -151,63 +151,77 @@ The following steps will explain how to set up a Ubuntu virtual machine. After t
    - nrfjprog
    - nrf-udev
    - nrfutil
+4. Clone the RIOT repository,
+   ```
+   git clone git@github.com:RIOT-OS/RIOT.git
+   ```
+5. Clone this project.
+   ```
+   git clone https://github.com/alllexander1/IoTProject.git
+   ```
 
 ## Border Router
 
-**Overview**
+**Overview:**
 
-The border router is used to route packets between the sensor node and the Linux system. This component is necessary because the sensor node cannot directly send packets to the internet, since it is in a 6Lo network. It has two interfaces: A downstream to run 6LoWPAN and an IPv6 uplink. The border router program is based on the "gnrc_border_router" example program with small modifications to run it on a *nrf52840dongle*.
+The border router is used to route packets between the sensor node and the internet. This component is necessary because the sensor node cannot directly send packets to the internet, since it is in a 6Lo network. The border router routes the packets between a 6Lo network and a 'normal' IPv6 network. It has two interfaces: A downstream to run 6LoWPAN and an IPv6 uplink. The program is based on the "gnrc_border_router" example program with small modifications so it can run on a *nrf52840dongle*.
 
 
-**Set up**
+**Set up:**
 
-1. Make sure to set the path to the RIOT directory in the Makefile of the border router program.
+1. Open the Makefile of the *Border Router* program. 
+2. Set the path to the RIOT directory corectly.
    ```
    RIOTBASE ?= $<Path to RIOT>
    ```
-2. Set the IPv6 prefix to the prefix of your network. Make sure to change the last two digits.
+3. Set the IPv6 prefix to the prefix of your network. Make sure to change the last two digits.
    ```
    IPV6_PREFIX ?= 2001:470:7347:c211::/64
    ```
-3. Check the path to the serial port of the dongle.
+4. Open a terminal and navigate to the *Border Router* folder.
+5. Check the path to the serial port of the dongle.
    ```
    make list-ttys
    ```
-4. Flash the program on a *nrf52840dongle*. Eg for port: "/dev/ttyACM0".
+6. Flash the program on a *nrf52840dongle*. Eg for port: "/dev/ttyACM0".
    ```
    PORT=/dev/ttyACM0 BOARD="nrf52840dongle" make all flash
    ```
 
 ## Sensor Node
 
-**Overview**
+**Overview:**
 
-The sensor node component is responsible for sending temperature values to the cloud. To do that, the *SAUL* module is used to read the current temperature from the build-in sensor. To send the data to the cloud, the MQTT-SN protocol is used. The temperature data is sent every *x* seconds by publishing the value on a topic called "temperature". The sensor node is also listening for commands from the user. For that, it is subscribed to a topic "requests" where a callback function checks the command and publish a temperature value immediately. To make sure that the temperature reading function is not called from the callback function and the publishing loop at the same time, it is synchronized using *mutex*. For the MQTT-SN client, EMCUTE module is used. 
+The sensor node component is responsible for sending temperature values to the cloud. To do that, the *SAUL* module is used to read the current temperature from the build-in sensor. To send the data to the cloud, MQTT-SN (MQTT for Sensor Networks) protocol is used. The temperature data is sent every *x* seconds by publishing the value on a topic called "temperature". The sensor node is also listening for commands from the user. For that, it subscribes for a topic "requests". When a request is received, a callback function checks the command and publish the temperature immediately. For now there is only one valid command "get_temp_now". To make sure that the temperature reading function is not called by the callback function and the publishing loop at the same time, it is synchronized using *mutex*. For the MQTT-SN client, *EMCUTE* module is used. The diagram bellow shows the communication process between the sensor node and the MQTT broker.
 
-**Set up**
+<img src="img/sn.png">
+<br>
 
-1. Unlock the *nrf52840dk* board.
+**Set up:**
+
+1. Open a terminal and unlock the *nrf52840dk* board.
    ```
    nrfjprog --recover
    ```
-2. Change the destination IPv6 address to the address of your EC2 instance.
+2. In the *Sensor Node* folder open the main.c file. 
+3. Change the destination IPv6 address to the address of your EC2 instance.
    ```
    char * dest_addr = "<EC2 IPv6 address>";
    ```
-3. The publishing interval can be changed here:
+4. The publishing interval can be changed here:
    ```
    xtimer_sleep(60);
    ```
-4. Flash the program on a *nrf52840dk* board:
-   ```
-   PORT=/dev/ttyACM2 BOARD="nrf52840dk" make all flash
-   ```
+- Note: The program should be flashed when the cloud part is running, since a connection loop or reconnecting mechanism is not implemented.
 
 ## Cloud
 
-**Overview**
+**Overview:**
 
-**Set up**
+For the cloud part AWS (Amazon Web Services) is used. The cloud system consists of an Ubuntu EC2 instance with an IPv6 address. The instance itself consists of three components. The first one is a *Mosquito RSMB broker* which is a middleware between MQTT clients. The second component is a *SQLITE database* where the temperature values and the corresponding date and time are stored. The last part is a *Backend Script* which is responsible for the communication with the sensor node and the end user. It consists of two parts: a MQTT client (Paho) and a HTTP server (Flask). The MQTT client is listening for messages from the topic "temperature". When a message is received, it is processed and stored at the database. The HTTP server has two APIs. The first one receives the latest ID available at the user interface and returns newer data entries if available. The second one is for sending a request to the sensor node. For that the MQTT client publishes a message "get_temp_now" on the topic "requests". 
+
+<img src="img/cloud_diagram.png">
+<br>
 
 ***Create EC2 instance***
 
@@ -403,23 +417,25 @@ Copy the Example and use it in your Linux Ubuntu environment. To connect to your
 
 Your EC2 is established. 
 
-***Installations***
+***Create EC2 instance:***
 
-1. Create a directory e.g. Project and navigate into it.
+***Installations:***
+1. Open the EC2 instance terminal or connect via ssh. 
+2. Create a directory e.g. Project and navigate into it.
 	```
 	mkdir Project
 	cd Project
 	```
-2. Install the Mosquito.RSMB broker. Follow the [Setting up a broker](https://github.com/RIOT-OS/RIOT/tree/master/examples/emcute_mqttsn) (Steps 1-3) tutorial.
-3. Install SQLITE
+3. Install the Mosquito.RSMB broker. Follow the [Setting up a broker](https://github.com/RIOT-OS/RIOT/tree/master/examples/emcute_mqttsn) (Steps 1-3) tutorial.
+4. Install SQLITE.
 	```
 	sudo apt install sqlite3
 	```
-4. In the Project directory, create a database.
+5. In the Project directory, create a database.
    ```
    sqlite3 mybase.db
    ```
-5. Create a temperature table.
+6. Create a temperature table.
 	```
 	CREATE TABLE temperature (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -430,7 +446,7 @@ Your EC2 is established.
 	);
 	```
 	Type ```.exit``` to close sqlite3.
-6. For the backend script, install the following libraries:
+7. For the backend script, install the following libraries:
 	- PAHO MQTT
 		```
 		pip install paho-mqtt
@@ -443,23 +459,32 @@ Your EC2 is established.
 		```
 		pip install flask-cors
 		```
-7. Change the address of the broker.
+8. Copy the *server.py* file from the *Cloud* directory into the *Project* directory.
+9. Change the address of the broker.
 	```
 	broker_address = "<IPv6 of the EC2 instance>"
 	```
-8. Enable port 1885 for incoming UDP IPv6 packets and set up a security rule.
-9. Enable port 5000 for incoming TCP IPv6 packets and set up a security rule.
+10. Enable port 1885 for incoming UDP IPv6 packets and set up a security rule.
+11. Enable port 5000 for incoming TCP IPv6 packets and set up a security rule.
 
 
 ## User Interface
 
-**Overview**
+**Overview:**
 
-The user interface is a Desktop program which is used to visualize the stored data. The data is read from a database located at the cloud and is presented into a table. Also a temperature diagram can be created for the current day or the current month. The user can update the data or send a request to the sensor node via the cloud. Note, that new data is only received when clicking on the "Update" button. For the communication between the application and the cloud, HTTP protocol is used. Since for the communication IPv6 is used, the machine of the user has to have a IPv6 network connection. The Program itself is written in Python using the Tkinter library. 
+The user interface is a Desktop program which is used to visualize the stored data. The data is read from a database located at the cloud and is presented into a table. Also a temperature diagram can be created for the current day or the current month. The user can update the data or send a request to the sensor node via the cloud. Note, that the presented data is only updated by clicking on the "Update" button. For the communication between the application and the cloud, HTTP protocol is used. Since for the communication IPv6 is used, the machine of the user has to have a IPv6 network connection. The Program itself is written in Python using the 'Tkinter' library for the graphical user interface, 'Matplotlib' for the diagrams and 'Requests' for the HTTP requests. 
 
-**Set up**
+<img src="img/ui.PNG">
+<br>
+<div style="display: flex;">
+  <img src="img/diagram_today.PNG" style="flex: 1; width:50%; height:50%; margin-right: 2px;">
+  <img src="img/diagram_thismonth.PNG" style="flex: 1; width:50%; height:50%; margin-left: 2px;">
+</div>
+<br>
 
-1. Make sure that python is installed.
+**Set up:**
+
+1. Make sure that python is installed otherwise install it.
 2. Install the following python libraries:
 	- Tkinter
 		```
@@ -473,37 +498,41 @@ The user interface is a Desktop program which is used to visualize the stored da
 		```
 		pip install requests
 		```
-3. Change the address of the EC2 instance in the Client.py file.
+3. Open the *UI* folder.
+4. Change the address of the EC2 instance in the Client.py file.
 	```
 	self.base_url = "http://[<IPv6_Address>]:5000"
 	```
 
-# Start System
+# Start The System
 
 1. Open two terminals and connect with the EC2 instance via ssh.
-2. In the first terminal start the Mosquitto RSMB broker.
+2. In both terminals navigate to the Project directory.
+   ```
+   cd Project
+   ```
+3. In the first terminal start the Mosquitto RSMB broker.
    ```
    cd mosquitto.rsmb/rsmb/src
-   
    ./broker_mqtts config.conf
    ```
-3. In the second terminal start the backend script.
+4. In the second terminal start the backend script.
    ```
    python3 server.py
    ```
-4. Start the border router.
+5. Start the border router.
    ```
    PORT=/dev/ttyACM0 BOARD="nrf52840dongle" make term
    ```
-5. Start the sensor node.
+6. Start the sensor node.
    ```
    PORT=/dev/ttyACM2 BOARD="nrf52840dk" make all flash term
    ```
-   If it is already running restart it or reflash it.
+   If it is already running or does not print the status restart it or reflash it.
    ```
    PORT=/dev/ttyACM2 BOARD="nrf52840dk" make reset
    ```
-6. Start the user interface.
+7. Start the user interface.
    ```
    python3 Application.py
    ```
