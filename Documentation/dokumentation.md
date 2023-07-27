@@ -546,3 +546,4 @@ The user interface is a Desktop program which is used to visualize the stored da
 - Tkinter: https://www.pythontutorial.net/tkinter/tkinter-mvc/ 
 - Flask: https://flask.palletsprojects.com/en/2.3.x/ 
 - Paho: http://www.steves-internet-guide.com/into-mqtt-python-client/ 
+- Assign IPv6 address to EC2 instance: https://4sysops.com/archives/assign-an-ipv6-address-to-an-ec2-instance-dual-stack/ 
