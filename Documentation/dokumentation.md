@@ -224,7 +224,7 @@ For the cloud part AWS (Amazon Web Services) is used. The cloud system consists 
 <br>
 <br>
 
-**Set up**
+**Set up:**
 
 ***Create EC2 instance:***
 
